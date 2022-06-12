@@ -83,7 +83,7 @@ def logisticRegression(city):
     # print("n: " + str(secondResult[1]) + "\n")
 
     c = secondResult[0]
-    b = a/city.points[0][1] - 1
+    b = (a/city.points[0][1] - 1)
 
     city.logisticParameters = [a,b,c]
 
