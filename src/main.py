@@ -1,19 +1,22 @@
 from municipio import municipio
-from linearRegression import logisticRegression, plotLogistic
+from linearRegression import logisticRegression, plotLogistic, getError, saveExcel
 import matplotlib.pyplot as plt
 from os import listdir
 
 def main():
 
     for file in listdir("data"):
-        countyName = file.split(".txt")[0]
+        cityName = file.split(".csv")[0]
 
-        county = municipio(countyName, "data/" + countyName + ".txt")
+        city = municipio(cityName, "data/" + cityName + ".csv")
 
-        result = logisticRegression(county.points)
-        plotLogistic(result, county)
+        logisticRegression(city)
+        plotLogistic(city)
         
-        print("Resultado da regressao logistica: " + str(result) +"\n")
+        print("Resultado da regressao logistica - " + cityName + ":" + str(city.logisticParameters) +"\n")
+
+        getError(city)
+        saveExcel(city)
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from openpyxl import Workbook
 
 def leastSquares(points):
 
@@ -22,7 +23,7 @@ def leastSquares(points):
 
     return [m,n]
 
-def logisticRegression(points):
+def logisticRegression(city):
     a = 0
     b = 0
     c = 0
@@ -33,7 +34,7 @@ def logisticRegression(points):
     p2 = []     #p_t+1
     z = []
 
-    for point in points:
+    for point in city.points:
         t.append(point[0])
         p.append(point[1])
     
@@ -82,14 +83,14 @@ def logisticRegression(points):
     # print("n: " + str(secondResult[1]) + "\n")
 
     c = secondResult[0]
-    b = a/points[0][1] - 1
+    b = a/city.points[0][1] - 1
 
-    return [a,b,c]
+    city.logisticParameters = [a,b,c]
 
-def plotLogistic(parameters, city):
+def plotLogistic(city):
 
     x = np.linspace(city.points[0][0], city.points[-1][0],1000)
-    y = parameters[0]/(parameters[1]*np.exp((-1)*parameters[2]*x) + 1)
+    y = city.logisticParameters[0]/(city.logisticParameters[1]*np.exp((-1)*city.logisticParameters[2]*x) + 1)
 
 
     if not len(city.points):
@@ -106,3 +107,54 @@ def plotLogistic(parameters, city):
     plt.scatter(x2,y2)
     plt.plot(x,y, 'g')
     plt.show()
+
+def getError(city):
+
+    for i in range(len(city.points)):
+
+        t = city.points[i][0]
+        realValue = city.points[i][1]
+
+        y = city.logisticParameters[0]/(city.logisticParameters[1]*np.exp((-1)*city.logisticParameters[2]*t) + 1)
+
+        error = abs( y - realValue)/realValue
+
+        city.logisticResult.append(y)
+        city.error.append(error)
+
+def saveExcel(city):
+  
+    workbook = Workbook()
+    
+    sheet = workbook.active 
+
+    c1 = sheet.cell(row = 1, column = 1)   
+    c1.value = "Ano"
+    
+    c2 = sheet.cell(row= 1 , column = 2) 
+    c2.value = "Valor Real"
+
+    c3 = sheet.cell(row= 1 , column = 3) 
+    c3.value = "Logístico"
+
+    c4 = sheet.cell(row= 1 , column = 4) 
+    c4.value = "Erro"
+
+    for i in range(len(city.points)):
+        c = sheet.cell(row = 2 + i, column = 1)
+        c.value = city.points[i][0]
+
+    for i in range(len(city.points)):
+        c = sheet.cell(row = 2 + i, column = 2)
+        c.value = city.points[i][1]
+
+    for i in range(len(city.logisticResult)):
+        c = sheet.cell(row = 2 + i, column = 3)
+        c.value = city.logisticResult[i]
+
+    for i in range(len(city.error)):
+        c = sheet.cell(row = 2 + i, column = 4)
+        c.value = city.error[i]
+
+
+    workbook.save(filename="results/logisticRegression_" + city.name + ".xlsx")
