@@ -1,5 +1,5 @@
 from municipio import municipio
-from linearRegression import logisticRegression, plotLogistic, getError, saveExcel
+from linearRegression import gradientDescent, logisticRegression, plotLogistic, getError, saveExcel
 import matplotlib.pyplot as plt
 from os import listdir
 
@@ -10,6 +10,7 @@ def main():
 
         city = municipio(cityName, "data/" + cityName + ".csv")
 
+        # gradientDescent(city)
         logisticRegression(city)
         plotLogistic(city)
         
