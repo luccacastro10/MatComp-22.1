@@ -1,4 +1,5 @@
 import math
+from termios import CS5
 import numpy as np
 import matplotlib.pyplot as plt
 from openpyxl import Workbook
@@ -69,6 +70,8 @@ def logisticRegression(city):
     r = firstResult[1]
     k = (-1)*firstResult[1]/firstResult[0]
 
+    city.logisticParameters = [p0,k,r]
+
     k   = p[8] + p[9]
     t_  = (t[8] + t[9])/2
 
@@ -78,33 +81,49 @@ def logisticRegression(city):
     print("Valor de r encontrado: " + str(r))
 
 
-    city.logisticParameters = [p0,k,r]
+    city.adjustedLogisticParameters = [p0,k,r]
 
 def plotLogistic(city):
+
+    figure, axis = plt.subplots(1, 2)
 
     p0 = city.logisticParameters[0]
     k = city.logisticParameters[1]
     r = city.logisticParameters[2]
 
+    i = 0
 
-    x = np.linspace(city.points[0][0], city.points[-1][0],1000)
-    y = (p0*k)/((k-p0)*np.exp((-1)*r*x) + p0)
+    for i in range(2):
+
+        x = np.linspace(city.points[0][0], city.points[-1][0],1000)
+        y = (p0*k)/((k-p0)*np.exp((-1)*r*x) + p0)
 
 
-    if not len(city.points):
-        city.loadPoints()
+        if not len(city.points):
+            city.loadPoints()
 
-    x2 = []
-    y2 = []
+        x2 = []
+        y2 = []
 
-    for point in city.points:
-        x2.append(point[0])
-        y2.append(point[1])
+        for point in city.points:
+            x2.append(point[0])
+            y2.append(point[1])
 
-    plt.title("Logistic Regression: " + city.name)
-    plt.scatter(x2,y2)
-    plt.plot(x,y, 'g')
-    plt.show()
+        axis[i].set_title("Logistic Regression: " + city.name)
+        axis[i].scatter(x2,y2)
+        axis[i].plot(x,y, 'g')
+
+        p0  = city.adjustedLogisticParameters[0]
+        k   = city.adjustedLogisticParameters[1]
+        r   = city.adjustedLogisticParameters[2]
+
+        i += 1
+
+    plt.gcf().set_size_inches(8, 5)
+    # plt.show()
+
+    plt.savefig(fname="results/images/logisticRegression_" + city.name + ".jpg")
+
 
 def getError(city):
 
@@ -122,15 +141,31 @@ def getError(city):
         error = abs( y - realValue)/realValue
 
         city.logisticResult.append(y)
-        city.error.append(error)
+        city.logisticError.append(error)
+
+    p0 = city.adjustedLogisticParameters[0]
+    k = city.adjustedLogisticParameters[1]
+    r = city.adjustedLogisticParameters[2]
+
+    for i in range(len(city.points)):
+
+        t = city.points[i][0]
+        realValue = city.points[i][1]
+
+        y = (p0*k)/((k-p0)*np.exp((-1)*r*city.points[i][0]) + p0)
+
+        error = abs( y - realValue)/realValue
+
+        city.adjustedLogisticResult.append(y)
+        city.adjustedLogisticError.append(error)
 
 def gradientDescent(city):
     
     # P = (p0 * k) / (k - p0)*e^-rt + p0
 
     p0 = city.points[0][1]
-    k = 1500
-    r = 500000
+    k = 300000000
+    r = 1
 
     limitStepSize = 0.01
     learningRate = 0.01
@@ -148,7 +183,9 @@ def gradientDescent(city):
         for point in city.points:
 
             exp = np.exp((-1)*r*point[0])
+            print("exp: " + str(exp))
             den = (exp*(k-p0) + p0 )**2
+            print("den: " + str(den))
 
             fx = (p0*k)/((k-p0)*exp + p0)
 
@@ -167,9 +204,11 @@ def gradientDescent(city):
         print("setpSize_ddk: " + str(setpSize_ddk))
         print("setpSize_ddr: " + str(setpSize_ddr))
 
-
         k = k - setpSize_ddk
         r = r - setpSize_ddr
+        
+        # if iterations >= 2:
+        #     break
 
         if ( (abs(setpSize_ddk) < limitStepSize) and (abs(setpSize_ddr) < limitStepSize) ):
             print("ENTROU NO ELSE!!!!")
@@ -197,7 +236,13 @@ def saveExcel(city):
     c3.value = "Logístico"
 
     c4 = sheet.cell(row= 1 , column = 4) 
-    c4.value = "Erro"
+    c4.value = "Logístico Ajustado"
+
+    c5 = sheet.cell(row= 1 , column = 5) 
+    c5.value = "Erro Logístico"
+
+    c6 = sheet.cell(row= 1 , column = 6) 
+    c6.value = "Erro Logístico Ajustado"
 
     for i in range(len(city.points)):
         c = sheet.cell(row = 2 + i, column = 1)
@@ -211,9 +256,17 @@ def saveExcel(city):
         c = sheet.cell(row = 2 + i, column = 3)
         c.value = city.logisticResult[i]
 
-    for i in range(len(city.error)):
+    for i in range(len(city.logisticResult)):
         c = sheet.cell(row = 2 + i, column = 4)
-        c.value = city.error[i]
+        c.value = city.adjustedLogisticResult[i]
+
+    for i in range(len(city.logisticError)):
+        c = sheet.cell(row = 2 + i, column = 5)
+        c.value = city.logisticError[i]
+
+    for i in range(len(city.logisticError)):
+        c = sheet.cell(row = 2 + i, column = 6)
+        c.value = city.adjustedLogisticError[i]
 
 
-    workbook.save(filename="results/logisticRegression_" + city.name + ".xlsx")
+    workbook.save(filename="results/tables/logisticRegression_" + city.name + ".xlsx")

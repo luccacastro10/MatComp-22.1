@@ -7,8 +7,11 @@ class municipio:
         self.points = []
         self.loadPoints()
         self.logisticResult = []
+        self.adjustedLogisticResult = []
         self.logisticParameters = []
-        self.error = []
+        self.adjustedLogisticParameters = []
+        self.logisticError = []
+        self.adjustedLogisticError = []
 
     def loadPoints(self):
         file = open(self.dataPath, "r")
