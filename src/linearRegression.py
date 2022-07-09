@@ -1,5 +1,4 @@
 import math
-from termios import CS5
 import numpy as np
 import matplotlib.pyplot as plt
 from openpyxl import Workbook
