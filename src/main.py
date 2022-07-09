@@ -1,4 +1,3 @@
-# Projeto Mat comp 
 from municipio import municipio
 from linearRegression import gradientDescent, logisticRegression, plotLogistic, getError, saveExcel
 import matplotlib.pyplot as plt
