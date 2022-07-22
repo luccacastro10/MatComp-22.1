@@ -10,11 +10,15 @@ def main():
 
         city = municipio(cityName, "data/" + cityName + ".csv")
 
-        # gradientDescent(city)
         logisticRegression(city)
+        gradientDescent(city)
         plotLogistic(city)
         
-        print("Resultado da regressao logistica - " + cityName + ":" + str(city.logisticParameters) +"\n")
+        print("-------------------------------------------------------------------------------------")
+        print(cityName + ":" + str(city.logisticParameters) + " - Resultado da regressao linear\n")
+        print(cityName + ":" + str(city.adjustedLogisticParameters) + " - Resultado da regressao linear ajustada\n")
+        print(cityName + ":" + str(city.gradientParameters) + " - Resultado da descida de gradiente\n\n")
+
 
         getError(city)
         saveExcel(city)
