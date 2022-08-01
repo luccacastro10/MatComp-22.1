@@ -101,7 +101,7 @@ def gradientDescent(city):
     r = city.adjustedLogisticParameters[2] # Tomamos os parâmetros obtidos pelo ponto de inflexão como nosso ponto de partida da descida de gradiente
 
     limitStepSize = 0.00001
-    learningRateR = 0.001
+    learningRateR = 0.000001
     learningRateK = 0.001
 
     iterations = 0
