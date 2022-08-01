@@ -1,30 +1,25 @@
 from municipio import municipio
-from linearRegression import gradientDescent, logisticRegression, plotLogistic, getError, saveExcel
-import matplotlib.pyplot as plt
-from os import listdir
+from linearRegression import gradientDescent, logisticRegression, plotLogistic, getError
 
 def main():
 
-    for file in listdir("data"):
-        cityName = file.split(".csv")[0]
+    cityName = "saopaulo"
 
-        city = municipio(cityName, "data/" + cityName + ".csv")
+    city = municipio(cityName, "data/" + cityName + ".csv")
 
-        logisticRegression(city)
-        gradientDescent(city)
-        plotLogistic(city)
-        
-        print("-------------------------------------------------------------------------------------")
-        print(cityName + ":" + str(city.logisticParameters) + " - Resultado da regressao linear\n")
-        print(cityName + ":" + str(city.adjustedLogisticParameters) + " - Resultado da regressao linear ajustada\n")
-        print(cityName + ":" + str(city.gradientParameters) + " - Resultado da descida de gradiente\n\n")
+    logisticRegression(city)
+    gradientDescent(city)
+    plotLogistic(city)
+    
+    print("-------------------------------------------------------------------------------------")
+    print(city.name + ":" + str(city.logisticParameters) + " - Resultado da regressao linear\n")
+    print(city.name + ":" + str(city.adjustedLogisticParameters) + " - Resultado da regressao linear ajustada\n")
+    print(city.name + ":" + str(city.gradientParameters) + " - Resultado da descida de gradiente\n")
+    print("Resultado do ajuste logistico para a cidade de " + city.name + " salvo na pasta results\n\n")
 
-
-        getError(city)
-        saveExcel(city)
+    getError(city)
 
 if __name__ == "__main__":
     main()
-
 
 

@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-
 class municipio:
     def __init__(self, name, path):
         self.name = name
